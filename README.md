@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StageWise
 
-## Getting Started
+StageWise is an AI-powered presentation and public-speaking coach. It helps people improve delivery and content using measurable evidence from speech, locally processed posture/gesture signals, and optionally uploaded presentation slides.
 
-First, run the development server:
+The coaching model is deliberately bounded: deterministic code produces measurements; AI interprets those measurements and proposes evidence-linked guidance. It is not a general-purpose chatbot or a source of invented analytics.
 
-```bash
+## Product capabilities in scope
+
+- Speech transcription and delivery analysis: speaking rate, filler words, pauses, and rhythm.
+- Local camera analysis for posture and hand gestures using MediaPipe Tasks Vision. Camera video is never uploaded or stored.
+- Presentation content and structure feedback.
+- Optional slide upload and alignment between slide content and the spoken presentation.
+- Evidence-backed recommendations whose claims can be traced to metrics, transcript spans, or slide references.
+
+See [docs/feature-scope.md](docs/feature-scope.md) for boundaries and [docs/architecture.md](docs/architecture.md) for the proposed module design and data flow.
+
+## Development setup
+
+Use the actual project root, `D:\StageWise\stagewise` (the folder containing `package.json`). From there:
+
+```powershell
+npm install
+Copy-Item .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>. Add a server-only `OPENAI_API_KEY` to `.env.local` only when enabling server-side AI interpretation. Never prefix secrets with `NEXT_PUBLIC_`. Do not commit `.env.local`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Useful commands:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+npm run lint
+npm run build
+```
 
-## Learn More
+## Stack
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js App Router, React, TypeScript, Tailwind CSS
+- MediaPipe Tasks Vision and browser Media APIs (Web Audio API, MediaRecorder API)
+- OpenAI API through server-side services
+- Zod for boundary validation
+- Officeparser for supported presentation extraction
+- Recharts for analysis visualizations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Dependencies should be introduced only when a scoped phase needs them. The list describes the target stack, not a claim that every feature is implemented yet.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development approach
 
-## Deploy on Vercel
+Implement in small phases: define contracts and privacy boundaries; build capture/upload UX; implement deterministic speech and media analytics; add slide parsing and alignment; then add evidence-constrained AI coaching and visualizations. See the initial checklist in `docs/architecture.md`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Do not represent placeholder values as analysis. Keep mocks isolated and explicitly identified as development-only.
